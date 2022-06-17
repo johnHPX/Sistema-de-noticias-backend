@@ -1,0 +1,9 @@
+project: 
+  name: "sistema-noticia"
+  port: "4083"
+database:
+  host: "localhost"
+  user: "postgres"
+  pswd: "1234567890"
+  dbnm: "db-news"
+  port: "5432"

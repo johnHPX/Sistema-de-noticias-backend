@@ -1,3 +1,232 @@
 # sistemaDeNoticias
 Uma api feita baseada em uma prova para desenvolcedores junior da DevMedia, onde originalmente era para ter sindo feito com php e mysql. Eu fiz com go e postgrsql e acresentei mais coisas no que tinha na ideia original. Essas melhorias foram feitas com objetivo de testar meus conhecimentos.
 
+
+# estrutura das requisições e respostas
+
+tanto as requisições quanto as respostas serão dadas por JSON.
+
+#### - _BODY_
+
+exemplos de JSON a serem enviados pelo corpo da requisição.
+
+```
+## object
+
+{
+  "attribute: "value",
+  "attribute": [{
+    "attribute: "value",
+  }]
+}
+
+## array
+
+[
+  {
+    "attribute: "value",
+  },
+  {
+    "attribute: "value",
+  }
+]
+
+```
+
+#### - _queries_
+
+passando dados pela URL.
+
+/example?attribute=value&attribute=value
+
+# Estrutura de erros
+
+STATUS = 403, 404, 407, 500 => {
+  "code": integer,
+  "message": string,
+  "mid": string,
+}
+
+# Rotas
+
+## 1. [HOST:PORT]/noticia
+
+criando um nova notícia
+
+#### - _Request_
+
+| request | type   | method |
+| ------- | ------ | ------ |
+| body    | object | POST   |
+
+```
+| attribute name | type         | size  | is it required? | description                                      |
+| -------------- | ------------ | ----- | --------------- | ------------------------------------------------ |
+| `titulo`       | `string`     | `255` | `true`          | titulo da notícia                                |
+| `conteudos`    | `[]conteudo` | `-`   | `true`          | topicos da notícia                               |
+| `categoria`    | `string`     | `100` | `true`          | categoria da notícia                             |
+| `mid`          | `string`     | `-`   | `false`         | mensagem da resposta caso o codigo http seja 200 |
+
+| conteudo    | type     | size   | is it required? | description                            |
+| ----------- | -------- | ------ | --------------- | -------------------------------------- |
+| `subTitulo` | `string` | `255`  | `true`          | subtitulo da notícia(titulo do topico) |
+| `texto`     | `string` | `5000` | `true`          | texto do topico                        |
+```
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+```
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+```
+
+## 2. [HOST:PORT]/noticias
+
+listando noticias
+
+#### - _Request_
+
+| request | type | method |
+| ------- | ---- | ------ |
+| queries | -    | GET    |
+
+```
+| attribute name | type     | size | is it required? | description                                      |
+| -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
+| `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
+```
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+```
+| attribute name | type         | description                                      |
+| -------------- | ------------ | ------------------------------------------------ |
+| `count`        | `int`        | numero linhas trazidas do database               |
+| `noticias`     | `[]Noticias` | array de noticias                                |
+| `mid`          | `string`     | mensagem da resposta caso o codigo http seja 200 |
+
+| Noticias    | type         | description          |
+| ----------- | ------------ | -------------------- |
+| `titulo`    | `string`     | titulo da notícia    |
+| `conteudos` | `[]conteudo` | topicos da notícia   |
+| `categoria` | `string`     | categoria da notícia |
+
+| conteudo    | type     | description                            |
+| ----------- | -------- | -------------------------------------- |
+| `subTitulo` | `string` | subtitulo da notícia(titulo do topico) |
+| `texto`     | `string` | texto do topico                        |
+```
+
+## 3. [HOST:PORT]/noticia/{titCat}
+
+listando noticias por titulo ou categoria
+
+#### - _Request_
+
+| request | type | method |
+| ------- | ---- | ------ |
+| queries | -    | GET    |
+
+```
+| attribute name | type     | size | is it required? | description                                      |
+| -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
+| `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
+```
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+```
+| attribute name | type         | description                                      |
+| -------------- | ------------ | ------------------------------------------------ |
+| `count`        | `int`        | numero linhas trazidas do database               |
+| `noticias`     | `[]Noticias` | array de noticias                                |
+| `mid`          | `string`     | mensagem da resposta caso o codigo http seja 200 |
+
+| Noticias    | type         | description          |
+| ----------- | ------------ | -------------------- |
+| `titulo`    | `string`     | titulo da notícia    |
+| `conteudos` | `[]conteudo` | topicos da notícia   |
+| `categoria` | `string`     | categoria da notícia |
+
+| conteudo    | type     | description                            |
+| ----------- | -------- | -------------------------------------- |
+| `subTitulo` | `string` | subtitulo da notícia(titulo do topico) |
+| `texto`     | `string` | texto do topico                        |
+```
+
+## 4. [HOST:PORT]/noticia/{nid}
+
+atualizando uma noticia por id
+
+#### - _Request_
+
+| request | type   | method |
+| ------- | ------ | ------ |
+| body    | object | PUT    |
+
+```
+| attribute name | type         | size  | is it required? | description                                      |
+| -------------- | ------------ | ----- | --------------- | ------------------------------------------------ |
+| `titulo`       | `string`     | `255` | `true`          | titulo da notícia                                |
+| `conteudos`    | `[]conteudo` | `-`   | `true`          | topicos da notícia                               |
+| `categoria`    | `string`     | `100` | `true`          | categoria da notícia                             |
+| `mid`          | `string`     | `-`   | `false`         | mensagem da resposta caso o codigo http seja 200 |
+
+| conteudo    | type     | size   | is it required? | description                            |
+| ----------- | -------- | ------ | --------------- | -------------------------------------- |
+| `subTitulo` | `string` | `255`  | `true`          | subtitulo da notícia(titulo do topico) |
+| `texto`     | `string` | `5000` | `true`          | texto do topico                        |
+```
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+```
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+```
+
+## 5. [HOST:PORT]/noticia/{nid}
+
+deletando uma noticia por id
+
+#### - _Request_
+
+| request | type | method |
+| ------- | ---- | ------ |
+| queries | -    | DELETE |
+
+```
+| attribute name | type     | size | is it required? | description                                      |
+| -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
+| `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
+```
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+```
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+```
