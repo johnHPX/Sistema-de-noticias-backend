@@ -11,6 +11,7 @@ type serviceCategoria interface {
 	Store(kind string) error
 	List() ([]*categoria.Entity, error)
 	Find(cid string) (*categoria.Entity, error)
+	Update(id, kind string) error
 }
 
 type categoriaServiceImpl struct{}
@@ -58,6 +59,33 @@ func (s *categoriaServiceImpl) Find(cid string) (*categoria.Entity, error) {
 		return nil, err
 	}
 	return entity, nil
+}
+
+func (s *categoriaServiceImpl) Update(id, kind string) error {
+	// validator
+	validator := validator.NewValidator()
+	if err := validator.CheckIsEmpty(kind, "categoria"); err != nil {
+		return err
+	}
+	str, err := validator.FormatedInput(kind)
+	if err != nil {
+		return err
+	}
+	kind = str
+	if err := validator.CheckLen(255, kind); err != nil {
+		return err
+	}
+
+	e := &categoria.Entity{
+		CID:  id,
+		Kind: kind,
+	}
+	rep := repository.NewCategoriaRepository()
+	err = rep.Update(e)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewCategoriaService() serviceCategoria {

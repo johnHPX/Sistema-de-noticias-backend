@@ -74,9 +74,9 @@ type listCategoriaRequest struct {
 }
 
 type listCategoriaResponse struct {
-	Count    int                `json:"count"`
+	Count    int                 `json:"count"`
 	Entities []*categoria.Entity `json:"categorias"`
-	MID      string             `json:"mid"`
+	MID      string              `json:"mid"`
 }
 
 func decodeListCategoriaRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -167,6 +167,60 @@ func FindCategoriaHandler() http.Handler {
 	return httptransport.NewServer(
 		makeFindCategoriaEndPoint(),
 		decodeFindCategoriaRequest,
+		util.EncodeResponse,
+		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
+	)
+}
+
+// ==============================
+// =========== UPDATE ===========
+// ==============================
+
+type updateCategoriaRequest struct {
+	ID   string
+	Kind string `json:"kind"`
+	MID  string `json:"mid"`
+}
+
+type updateCategoriaResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodeUpdateategoriaRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	dto := new(updateCategoriaRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	dto.ID = vars["id"]
+	return dto, nil
+}
+
+func makeUpdateCategoriandPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*updateCategoriaRequest)
+		if !ok {
+			return nil, util.CreateHttpErrorResponse(http.StatusBadRequest, 1006, errors.New("invalid request"), "na")
+		}
+		svc := service.NewCategoriaService()
+		err := svc.Update(req.ID, req.Kind)
+		if err != nil {
+			return nil, util.CreateHttpErrorResponse(http.StatusInternalServerError, 1007, err, req.MID)
+		}
+		//return data
+		return &updateCategoriaResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UpdateCategoriaHandler() http.Handler {
+	return httptransport.NewServer(
+		makeUpdateCategoriandPoint(),
+		decodeUpdateategoriaRequest,
 		util.EncodeResponse,
 		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
 	)

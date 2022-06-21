@@ -23,8 +23,8 @@ var RouterNotice = []Router{
 	},
 	{
 		TokenIsReq: false,
-		Path:       "/noticia/{nid}",
-		EndPointer: nil,
+		Path:       "/noticia/{id}",
+		EndPointer: resource.UpdateNoticiaHandler().ServeHTTP,
 		Method:     "PUT",
 	},
 	{

@@ -21,4 +21,10 @@ var RouterCategoria = []Router{
 		EndPointer: resource.FindCategoriaHandler().ServeHTTP,
 		Method:     "GET",
 	},
+	{
+		TokenIsReq: false,
+		Path:       "/categoria/{id}",
+		EndPointer: resource.UpdateCategoriaHandler().ServeHTTP,
+		Method:     "PUT",
+	},
 }

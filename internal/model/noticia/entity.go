@@ -6,6 +6,7 @@ type Entity struct {
 }
 
 type Conteudos struct {
+	CID string `json:"cid"`
 	SubTitulo string `json:"subTitulo"`
 	Texto     string `json:"texto"`
 }

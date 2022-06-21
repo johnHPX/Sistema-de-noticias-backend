@@ -26,7 +26,8 @@ type validadorObject struct{}
 func (v *validadorObject) CheckIsEmpty(input interface{}, nameInput string) error {
 	if reflect.ValueOf(input).Kind() == reflect.String {
 		str, ok := input.(string)
-		if !ok || str == "" {
+		s := strings.TrimSpace(str)
+		if !ok || s == "" {
 			return errors.New(fmt.Sprintf("%v é obrigatório e não pode está em branco", nameInput))
 		}
 	}

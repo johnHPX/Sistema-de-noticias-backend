@@ -12,6 +12,7 @@ type noticiaRepository interface {
 	Store(e *noticia.Entity) error
 	List() ([]*noticia.NoticiaEntity, error)
 	ListByTitOrCat(titCat string) ([]*noticia.NoticiaEntity, error)
+	Update(e *noticia.Entity) (error)
 }
 
 type noticiaRepositoryImpl struct{}
@@ -143,6 +144,39 @@ func (r *noticiaRepositoryImpl) ListByTitOrCat(titCat string) ([]*noticia.Notici
 	}
 
 	return entities, nil
+}
+
+func (r *noticiaRepositoryImpl) Update(e *noticia.Entity) (error) {
+	db, err := util.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	sqlText := `
+	update tb_noticia set
+		titulo = $2,
+		updated_at = now()
+	where deleted_at is null and id = $1
+	`
+	statement, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+	result, err := statement.Exec(e.NID, e.Titulo)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowAffected != 1 {
+		return errors.New("error when updating")
+	}
+
+	return nil
 }
 
 func NewNoticiaRepository() noticiaRepository {

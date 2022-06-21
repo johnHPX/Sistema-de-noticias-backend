@@ -179,3 +179,64 @@ func ListByTitOrCatNoticiaHandler() http.Handler {
 		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
 	)
 }
+
+// ==============================
+// =========== UPDATE ===========
+// ==============================
+
+type updateNoticiaRequest struct {
+	noticia.NoticiaEntity
+	MID string `json:"mid"`
+}
+
+type updateNoticiaResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodeUpdateNoticiaRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	dto := new(updateNoticiaRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	dto.ID = vars["id"]
+	return dto, nil
+}
+
+func makeUpdateNoticiaEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*updateNoticiaRequest)
+		if !ok {
+			return nil, util.CreateHttpErrorResponse(http.StatusBadRequest, 1006, errors.New("invalid request"), "na")
+		}
+		service := service.NewNoticiaService()
+		var c []conteudo.Entity
+		for _, v := range req.Conteudo {
+			c = append(c, conteudo.Entity{
+				CID: v.CID,
+				Subtitulo: v.SubTitulo,
+				Texto:     v.Texto,
+			})
+		}
+		err := service.Update(c, req.ID, req.Titulo, req.Categoria)
+		if err != nil {
+			return nil, util.CreateHttpErrorResponse(http.StatusInternalServerError, 1007, err, req.MID)
+		}
+		//return data
+		return &updateNoticiaResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UpdateNoticiaHandler() http.Handler {
+	return httptransport.NewServer(
+		makeUpdateNoticiaEndPoint(),
+		decodeUpdateNoticiaRequest,
+		util.EncodeResponse,
+		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
+	)
+}

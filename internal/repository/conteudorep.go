@@ -10,8 +10,8 @@ import (
 
 type conteudoRepository interface {
 	Store(e *conteudo.Entity) error
-	List() ([]*conteudo.Entity, error)
 	ListByNoticia(nid string) ([]*conteudo.Entity, error)
+	Update(e *conteudo.Entity) error
 }
 
 type conteudoRepositoryImpl struct{}
@@ -80,34 +80,6 @@ func (r *conteudoRepositoryImpl) Store(e *conteudo.Entity) error {
 	return nil
 }
 
-func (r *conteudoRepositoryImpl) List() ([]*conteudo.Entity, error) {
-	db, err := util.Connect()
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
-	sqlText := `
-		SELECT id,subtitulo,texto,noticia_nid FROM tb_conteudo
-	`
-	rows, err := db.Query(sqlText)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var entities []*conteudo.Entity
-	for rows.Next() {
-		e, err := r.scanIterator(rows)
-		if err != nil {
-			return nil, err
-		}
-		entities = append(entities, e)
-	}
-
-	return entities, nil
-
-}
-
 func (r *conteudoRepositoryImpl) ListByNoticia(nid string) ([]*conteudo.Entity, error) {
 	db, err := util.Connect()
 	if err != nil {
@@ -116,7 +88,7 @@ func (r *conteudoRepositoryImpl) ListByNoticia(nid string) ([]*conteudo.Entity, 
 	defer db.Close()
 	sqlText := `
 		SELECT id,subtitulo,texto,noticia_nid FROM tb_conteudo
-		where noticia_nid = $1
+		WHERE deleted_at is null and noticia_nid = $1
 	`
 	rows, err := db.Query(sqlText, nid)
 	if err != nil {
@@ -134,7 +106,40 @@ func (r *conteudoRepositoryImpl) ListByNoticia(nid string) ([]*conteudo.Entity, 
 	}
 
 	return entities, nil
+}
 
+func (r *conteudoRepositoryImpl) Update(e *conteudo.Entity) error {
+	db, err := util.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	sqlText := `
+	update tb_conteudo set
+		subtitulo = $2,
+		texto = $3,
+		updated_at = now()
+	where deleted_at is null and id = $1
+	`
+	statement, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+	result, err := statement.Exec(e.CID, e.Subtitulo, e.Texto)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowAffected != 1 {
+		return errors.New("error when updating")
+	}
+
+	return nil
 }
 
 func NewConteudoRepository() conteudoRepository {
