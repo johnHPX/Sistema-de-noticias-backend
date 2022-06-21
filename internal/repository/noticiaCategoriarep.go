@@ -8,6 +8,11 @@ import (
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
 )
 
+type noticiaCategoriaRepository interface {
+	Store(e *noticiacategoria.Entity) error
+	List() ([]*noticiacategoria.Entity, error)
+}
+
 type noticiaCategoriaRepositoryImpl struct{}
 
 func (r *noticiaCategoriaRepositoryImpl) scanIterator(rows *sql.Rows) (*noticiacategoria.Entity, error) {
@@ -64,7 +69,7 @@ func (r *noticiaCategoriaRepositoryImpl) Store(e *noticiacategoria.Entity) error
 	return nil
 }
 
-func (r *noticiaCategoriaRepositoryImpl) List() (*[]noticiacategoria.Entity, error) {
+func (r *noticiaCategoriaRepositoryImpl) List() ([]*noticiacategoria.Entity, error) {
 	db, err := util.Connect()
 	if err != nil {
 		return nil, err
@@ -79,19 +84,19 @@ func (r *noticiaCategoriaRepositoryImpl) List() (*[]noticiacategoria.Entity, err
 	}
 	defer rows.Close()
 
-	var entities []noticiacategoria.Entity
+	var entities []*noticiacategoria.Entity
 	for rows.Next() {
 		e, err := r.scanIterator(rows)
 		if err != nil {
 			return nil, err
 		}
-		entities = append(entities, *e)
+		entities = append(entities, e)
 	}
 
-	return &entities, nil
+	return entities, nil
 
 }
 
-func NewNoticiaCategoriaRepository() noticiacategoria.Repository {
+func NewNoticiaCategoriaRepository() noticiaCategoriaRepository {
 	return &noticiaCategoriaRepositoryImpl{}
 }

@@ -8,6 +8,13 @@ import (
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
 )
 
+type categoriaRepository interface {
+	Store(e *categoria.Entity) error
+	List() ([]*categoria.Entity, error)
+	Find(cid string) (*categoria.Entity, error)
+	FindByKind(kind string) (*categoria.Entity, error)
+}
+
 type categoriaRepositoryImpl struct{}
 
 func (r *categoriaRepositoryImpl) scanIterator(rows *sql.Rows) (*categoria.Entity, error) {
@@ -64,7 +71,7 @@ func (r *categoriaRepositoryImpl) Store(e *categoria.Entity) error {
 	return nil
 }
 
-func (r *categoriaRepositoryImpl) List() (*[]categoria.Entity, error) {
+func (r *categoriaRepositoryImpl) List() ([]*categoria.Entity, error) {
 	db, err := util.Connect()
 	if err != nil {
 		return nil, err
@@ -79,16 +86,16 @@ func (r *categoriaRepositoryImpl) List() (*[]categoria.Entity, error) {
 	}
 	defer rows.Close()
 
-	var entities []categoria.Entity
+	var entities []*categoria.Entity
 	for rows.Next() {
 		e, err := r.scanIterator(rows)
 		if err != nil {
 			return nil, err
 		}
-		entities = append(entities, *e)
+		entities = append(entities, e)
 	}
 
-	return &entities, nil
+	return entities, nil
 }
 
 func (r *categoriaRepositoryImpl) Find(cid string) (*categoria.Entity, error) {
@@ -118,6 +125,33 @@ func (r *categoriaRepositoryImpl) Find(cid string) (*categoria.Entity, error) {
 	return nil, errors.New("error finding")
 }
 
-func NewCategoriaRepository() categoria.Repository {
+func (r *categoriaRepositoryImpl) FindByKind(kind string) (*categoria.Entity, error) {
+	db, err := util.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	sqlText := `
+		SELECT id,kind FROM tb_categoria
+		WHERE deleted_at is null and kind = $1
+	`
+	row, err := db.Query(sqlText, kind)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+
+	if row.Next() {
+		e, err := r.scanIterator(row)
+		if err != nil {
+			return nil, err
+		}
+		return e, nil
+	}
+
+	return nil, errors.New("error finding categoria")
+}
+
+func NewCategoriaRepository() categoriaRepository {
 	return &categoriaRepositoryImpl{}
 }

@@ -1,12 +1,8 @@
 package conteudo
 
-type Conteudo struct {
+type Entity struct {
+	CID       string
 	Subtitulo string
 	Texto     string
-}
-
-type Entity struct {
-	CID     string
-	Contudo Conteudo
-	NID     string
+	NID       string
 }

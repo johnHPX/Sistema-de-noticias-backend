@@ -62,5 +62,6 @@ func CreateHttpErrorResponse(status, code int, err error, mid string) *errorResp
 // ==============================================================
 
 func EncodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	w.Header().Set("Content-Type", "application/json")
 	return json.NewEncoder(w).Encode(response)
 }

@@ -75,7 +75,7 @@ type listCategoriaRequest struct {
 
 type listCategoriaResponse struct {
 	Count    int                `json:"count"`
-	Entities []categoria.Entity `json:"categorias"`
+	Entities []*categoria.Entity `json:"categorias"`
 	MID      string             `json:"mid"`
 }
 
@@ -101,8 +101,8 @@ func makeListCategoriaEndPoint() endpoint.Endpoint {
 		}
 		//return data
 		return &listCategoriaResponse{
-			Count:    len(*entities),
-			Entities: *entities,
+			Count:    len(entities),
+			Entities: entities,
 			MID:      req.MID,
 		}, nil
 	}

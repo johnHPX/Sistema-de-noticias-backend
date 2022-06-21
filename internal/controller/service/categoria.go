@@ -9,7 +9,7 @@ import (
 
 type serviceCategoria interface {
 	Store(kind string) error
-	List() (*[]categoria.Entity, error)
+	List() ([]*categoria.Entity, error)
 	Find(cid string) (*categoria.Entity, error)
 }
 
@@ -42,7 +42,7 @@ func (s *categoriaServiceImpl) Store(kind string) error {
 	return nil
 }
 
-func (s *categoriaServiceImpl) List() (*[]categoria.Entity, error) {
+func (s *categoriaServiceImpl) List() ([]*categoria.Entity, error) {
 	rep := repository.NewCategoriaRepository()
 	entities, err := rep.List()
 	if err != nil {

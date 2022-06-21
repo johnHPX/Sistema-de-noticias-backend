@@ -8,6 +8,12 @@ import (
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
 )
 
+type conteudoRepository interface {
+	Store(e *conteudo.Entity) error
+	List() ([]*conteudo.Entity, error)
+	ListByNoticia(nid string) ([]*conteudo.Entity, error)
+}
+
 type conteudoRepositoryImpl struct{}
 
 func (r *conteudoRepositoryImpl) scanIterator(rows *sql.Rows) (*conteudo.Entity, error) {
@@ -33,10 +39,10 @@ func (r *conteudoRepositoryImpl) scanIterator(rows *sql.Rows) (*conteudo.Entity,
 		entity.CID = cid.String
 	}
 	if subtitulo.Valid {
-		entity.Contudo.Subtitulo = subtitulo.String
+		entity.Subtitulo = subtitulo.String
 	}
 	if texto.Valid {
-		entity.Contudo.Texto = texto.String
+		entity.Texto = texto.String
 	}
 	if nid.Valid {
 		entity.NID = nid.String
@@ -56,7 +62,7 @@ func (r *conteudoRepositoryImpl) Store(e *conteudo.Entity) error {
 	if err != nil {
 		return err
 	}
-	result, err := statement.Exec(e.CID, e.Contudo.Subtitulo, e.Contudo.Texto, e.NID)
+	result, err := statement.Exec(e.CID, e.Subtitulo, e.Texto, e.NID)
 	if err != nil {
 		return err
 	}
@@ -74,7 +80,7 @@ func (r *conteudoRepositoryImpl) Store(e *conteudo.Entity) error {
 	return nil
 }
 
-func (r *conteudoRepositoryImpl) List() (*[]conteudo.Entity, error) {
+func (r *conteudoRepositoryImpl) List() ([]*conteudo.Entity, error) {
 	db, err := util.Connect()
 	if err != nil {
 		return nil, err
@@ -89,19 +95,48 @@ func (r *conteudoRepositoryImpl) List() (*[]conteudo.Entity, error) {
 	}
 	defer rows.Close()
 
-	var entities []conteudo.Entity
+	var entities []*conteudo.Entity
 	for rows.Next() {
 		e, err := r.scanIterator(rows)
 		if err != nil {
 			return nil, err
 		}
-		entities = append(entities, *e)
+		entities = append(entities, e)
 	}
 
-	return &entities, nil
+	return entities, nil
 
 }
 
-func NewConteudoRepository() conteudo.Repository {
+func (r *conteudoRepositoryImpl) ListByNoticia(nid string) ([]*conteudo.Entity, error) {
+	db, err := util.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	sqlText := `
+		SELECT id,subtitulo,texto,noticia_nid FROM tb_conteudo
+		where noticia_nid = $1
+	`
+	rows, err := db.Query(sqlText, nid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var entities []*conteudo.Entity
+	for rows.Next() {
+		e, err := r.scanIterator(rows)
+		if err != nil {
+			return nil, err
+		}
+		entities = append(entities, e)
+	}
+
+	return entities, nil
+
+}
+
+func NewConteudoRepository() conteudoRepository {
 	return &conteudoRepositoryImpl{}
 }

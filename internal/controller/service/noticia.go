@@ -1,8 +1,6 @@
 package service
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/conteudo"
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/noticia"
@@ -12,13 +10,14 @@ import (
 )
 
 type serviceNoticia interface {
-	Store(conteudos []conteudo.Conteudo, titulo, categoria string) error
-	List() ([]noticia.NoticiaEntity, error)
+	Store(conteudos []conteudo.Entity, titulo, categoria string) error
+	List() ([]*noticia.NoticiaEntity, error)
+	ListByTitOrCat(titOrCat string) ([]*noticia.NoticiaEntity, error)
 }
 
 type noticiaServiceimpl struct{}
 
-func (s *noticiaServiceimpl) Store(conteudos []conteudo.Conteudo, titulo, cate string) error {
+func (s *noticiaServiceimpl) Store(conteudos []conteudo.Entity, titulo, cate string) error {
 	// validator
 	validator := validator.NewValidator()
 	for _, v := range conteudos {
@@ -65,21 +64,10 @@ func (s *noticiaServiceimpl) Store(conteudos []conteudo.Conteudo, titulo, cate s
 	}
 
 	// verific if categoria exists
-	ok := false
-	var categoriaID string
 	categoriaRep := repository.NewCategoriaRepository()
-	categoriaEntities, err := categoriaRep.List()
+	categoriaEntity, err := categoriaRep.FindByKind(cate)
 	if err != nil {
 		return err
-	}
-	for _, v := range *categoriaEntities {
-		if cate == v.Kind {
-			ok = true
-			categoriaID = v.CID
-		}
-	}
-	if !ok {
-		return errors.New("Essa categoria é invalida!")
 	}
 
 	noticaRep := repository.NewNoticiaRepository()
@@ -95,14 +83,11 @@ func (s *noticiaServiceimpl) Store(conteudos []conteudo.Conteudo, titulo, cate s
 	conteudoRep := repository.NewConteudoRepository()
 	for _, v := range conteudos {
 		cid := uuid.New()
-		c := conteudo.Conteudo{
+		conteudoEntity := &conteudo.Entity{
+			CID:       cid.String(),
 			Subtitulo: v.Subtitulo,
 			Texto:     v.Texto,
-		}
-		conteudoEntity := &conteudo.Entity{
-			CID:     cid.String(),
-			Contudo: c,
-			NID:     nid.String(),
+			NID:       nid.String(),
 		}
 		err := conteudoRep.Store(conteudoEntity)
 		if err != nil {
@@ -112,7 +97,7 @@ func (s *noticiaServiceimpl) Store(conteudos []conteudo.Conteudo, titulo, cate s
 	notCatRep := repository.NewNoticiaCategoriaRepository()
 	notCatEntity := &noticiacategoria.Entity{
 		NID: nid.String(),
-		CID: categoriaID,
+		CID: categoriaEntity.CID,
 	}
 	err = notCatRep.Store(notCatEntity)
 	if err != nil {
@@ -122,54 +107,51 @@ func (s *noticiaServiceimpl) Store(conteudos []conteudo.Conteudo, titulo, cate s
 	return nil
 }
 
-func (s *noticiaServiceimpl) List() ([]noticia.NoticiaEntity, error) {
+func (s *noticiaServiceimpl) List() ([]*noticia.NoticiaEntity, error) {
 	noticaRep := repository.NewNoticiaRepository()
-	n, err := noticaRep.List()
+	entities, err := noticaRep.List()
 	if err != nil {
 		return nil, err
 	}
 	conteudoRep := repository.NewConteudoRepository()
-	con, err := conteudoRep.List()
-	if err != nil {
-		return nil, err
-	}
-	notConRep := repository.NewNoticiaCategoriaRepository()
-	notCon, err := notConRep.List()
-	if err != nil {
-		return nil, err
-	}
-	categoriaRep := repository.NewCategoriaRepository()
-	entities := make([]noticia.NoticiaEntity, 0)
-	for _, not := range *n {
-		contuedosOfNoticia := make([]conteudo.Entity, 0)
-		for _, conteudo := range *con {
-			if not.NID == conteudo.NID {
-				contuedosOfNoticia = append(contuedosOfNoticia, conteudo)
-			}
-		}
-		var categoriaOfNoticia string
-		for _, Notcategoria := range *notCon {
-			if not.NID == Notcategoria.NID {
-				e, err := categoriaRep.Find(Notcategoria.CID)
-				if err != nil {
-					return nil, err
-				}
-				categoriaOfNoticia = e.Kind
-			}
+	for indice, value := range entities {
+		conteudoEntities, err := conteudoRep.ListByNoticia(value.ID)
+		if err != nil {
+			return nil, err
 		}
 		c := make([]noticia.Conteudos, 0)
-		for _, v := range contuedosOfNoticia {
+		for _, v := range conteudoEntities {
 			c = append(c, noticia.Conteudos{
-				SubTitulo: v.Contudo.Subtitulo,
-				Texto:     v.Contudo.Texto,
+				SubTitulo: v.Subtitulo,
+				Texto:     v.Texto,
 			})
 		}
-		entities = append(entities, noticia.NoticiaEntity{
-			ID:        not.NID,
-			Titulo:    not.Titulo,
-			Conteudo:  c,
-			Categoria: categoriaOfNoticia,
-		})
+		entities[indice].Conteudo = c
+	}
+
+	return entities, nil
+}
+
+func (s *noticiaServiceimpl) ListByTitOrCat(titOrCat string) ([]*noticia.NoticiaEntity, error) {
+	noticaRep := repository.NewNoticiaRepository()
+	entities, err := noticaRep.ListByTitOrCat(titOrCat)
+	if err != nil {
+		return nil, err
+	}
+	conteudoRep := repository.NewConteudoRepository()
+	for indice, value := range entities {
+		conteudoEntities, err := conteudoRep.ListByNoticia(value.ID)
+		if err != nil {
+			return nil, err
+		}
+		c := make([]noticia.Conteudos, 0)
+		for _, v := range conteudoEntities {
+			c = append(c, noticia.Conteudos{
+				SubTitulo: v.Subtitulo,
+				Texto:     v.Texto,
+			})
+		}
+		entities[indice].Conteudo = c
 	}
 
 	return entities, nil

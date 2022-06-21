@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/gorilla/mux"
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/controller/service"
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/conteudo"
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/noticia"
@@ -19,10 +20,8 @@ import (
 // ==============================
 
 type storeNoticiaRequest struct {
-	Titulo    string              `json:"titulo"`
-	Conteudo  []noticia.Conteudos `json:"conteudos"`
-	Categoria string              `json:"categoria"`
-	MID       string              `json:"mid"`
+	noticia.NoticiaEntity
+	MID string `json:"mid"`
 }
 
 type storeNoticiaResponse struct {
@@ -47,9 +46,9 @@ func makeStoreNoticiaEndPoint() endpoint.Endpoint {
 			return nil, util.CreateHttpErrorResponse(http.StatusBadRequest, 1000, errors.New("invalid request"), "na")
 		}
 		service := service.NewNoticiaService()
-		var c []conteudo.Conteudo
+		var c []conteudo.Entity
 		for _, v := range req.Conteudo {
-			c = append(c, conteudo.Conteudo{
+			c = append(c, conteudo.Entity{
 				Subtitulo: v.SubTitulo,
 				Texto:     v.Texto,
 			})
@@ -83,9 +82,9 @@ type listNoticiaRequest struct {
 }
 
 type listNoticiaResponse struct {
-	Count    int                     `json:"count"`
-	Entities []noticia.NoticiaEntity `json:"noticias"`
-	MID      string                  `json:"mid"`
+	Count    int                      `json:"count"`
+	Entities []*noticia.NoticiaEntity `json:"noticias"`
+	MID      string                   `json:"mid"`
 }
 
 func decodeListNoticiaRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -121,6 +120,61 @@ func ListNoticiaHandler() http.Handler {
 	return httptransport.NewServer(
 		makeListNoticiaEndPoint(),
 		decodeListNoticiaRequest,
+		util.EncodeResponse,
+		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
+	)
+}
+
+// =====================================================
+// =========== LIST BY TITULO OR CATEGORIA =============
+// =====================================================
+
+type listByTitOrCatNoticiaRequest struct {
+	TITCAT string `json:"-"`
+	MID    string `json:"-"`
+}
+
+type listByTitOrCatNoticiaResponse struct {
+	Count    int                     `json:"count"`
+	Entities []noticia.NoticiaEntity `json:"noticias"`
+	MID      string                  `json:"mid"`
+}
+
+func decodeListByTitOrCatNoticiaRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	mid := r.URL.Query().Get("mid")
+	dto := &listByTitOrCatNoticiaRequest{
+		TITCAT: vars["titcat"],
+		MID:    mid,
+	}
+	return dto, nil
+}
+
+func makeListByTitOrCatNoticiaEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*listByTitOrCatNoticiaRequest)
+		if !ok {
+			return nil, util.CreateHttpErrorResponse(http.StatusBadRequest, 1004, errors.New("invalid request"), "na")
+		}
+		service := service.NewNoticiaService()
+		entities, err := service.ListByTitOrCat(req.TITCAT)
+		if err != nil {
+			return nil, util.CreateHttpErrorResponse(http.StatusInternalServerError, 1005, err, req.MID)
+		}
+		//return data
+		return &listNoticiaResponse{
+			Count:    len(entities),
+			Entities: entities,
+			MID:      req.MID,
+		}, nil
+	}
+}
+
+func ListByTitOrCatNoticiaHandler() http.Handler {
+	return httptransport.NewServer(
+		makeListByTitOrCatNoticiaEndPoint(),
+		decodeListByTitOrCatNoticiaRequest,
 		util.EncodeResponse,
 		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
 	)

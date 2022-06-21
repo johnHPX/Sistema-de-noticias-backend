@@ -8,28 +8,39 @@ import (
 	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
 )
 
+type noticiaRepository interface {
+	Store(e *noticia.Entity) error
+	List() ([]*noticia.NoticiaEntity, error)
+	ListByTitOrCat(titCat string) ([]*noticia.NoticiaEntity, error)
+}
+
 type noticiaRepositoryImpl struct{}
 
-func (r *noticiaRepositoryImpl) scanIterator(rows *sql.Rows) (*noticia.Entity, error) {
+func (r *noticiaRepositoryImpl) scanIterator(rows *sql.Rows) (*noticia.NoticiaEntity, error) {
 	nid := sql.NullString{}
 	titulo := sql.NullString{}
+	categoria := sql.NullString{}
 
 	err := rows.Scan(
 		&nid,
 		&titulo,
+		&categoria,
 	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	entity := new(noticia.Entity)
+	entity := new(noticia.NoticiaEntity)
 
 	if nid.Valid {
-		entity.NID = nid.String
+		entity.ID = nid.String
 	}
 	if titulo.Valid {
 		entity.Titulo = titulo.String
+	}
+	if categoria.Valid {
+		entity.Categoria = categoria.String
 	}
 
 	return entity, nil
@@ -63,14 +74,20 @@ func (r *noticiaRepositoryImpl) Store(e *noticia.Entity) error {
 	return nil
 }
 
-func (r *noticiaRepositoryImpl) List() (*[]noticia.Entity, error) {
+func (r *noticiaRepositoryImpl) List() ([]*noticia.NoticiaEntity, error) {
 	db, err := util.Connect()
 	if err != nil {
 		return nil, err
 	}
 	defer db.Close()
 	sqlText := `
-		SELECT id, titulo FROM tb_noticia
+	select n.id,
+		n.titulo,
+		ca.kind
+	from tb_noticia  n
+	INNER JOIN tb_noticia_categoria nc ON nc.nid = n.id
+	INNER JOIN tb_categoria ca ON ca.id = nc.cid
+	where n.deleted_at is null and ca.deleted_at is null
 	`
 	rows, err := db.Query(sqlText)
 	if err != nil {
@@ -78,19 +95,56 @@ func (r *noticiaRepositoryImpl) List() (*[]noticia.Entity, error) {
 	}
 	defer rows.Close()
 
-	var entities []noticia.Entity
+	var entities []*noticia.NoticiaEntity
 	for rows.Next() {
 		e, err := r.scanIterator(rows)
 		if err != nil {
 			return nil, err
 		}
-		entities = append(entities, *e)
+		entities = append(entities, e)
 	}
 
-	return &entities, nil
+	return entities, nil
 
 }
 
-func NewNoticiaRepository() noticia.Repository {
+func (r *noticiaRepositoryImpl) ListByTitOrCat(titCat string) ([]*noticia.NoticiaEntity, error) {
+	db, err := util.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	sqlText := `
+	select n.id,
+		n.titulo,
+		ca.kind
+	from tb_noticia  n
+	INNER JOIN tb_noticia_categoria nc ON nc.nid = n.id
+	INNER JOIN tb_categoria ca ON ca.id = nc.cid
+	where n.deleted_at is null and ca.deleted_at is null
+	and (n.titulo like $1 or ca.kind like $2)
+	`
+
+	v := "%" + titCat + "%"
+
+	rows, err := db.Query(sqlText, v, v)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	entities := make([]*noticia.NoticiaEntity, 0)
+	for rows.Next() {
+		e, err := r.scanIterator(rows)
+		if err != nil {
+			return nil, err
+		}
+		entities = append(entities, e)
+	}
+
+	return entities, nil
+}
+
+func NewNoticiaRepository() noticiaRepository {
 	return &noticiaRepositoryImpl{}
 }
