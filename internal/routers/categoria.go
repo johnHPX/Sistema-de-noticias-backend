@@ -27,4 +27,10 @@ var RouterCategoria = []Router{
 		EndPointer: resource.UpdateCategoriaHandler().ServeHTTP,
 		Method:     "PUT",
 	},
+	{
+		TokenIsReq: false,
+		Path:       "/categoria/{id}",
+		EndPointer: resource.RemoveCategoriaHandler().ServeHTTP,
+		Method:     "DELETE",
+	},
 }

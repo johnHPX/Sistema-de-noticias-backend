@@ -12,6 +12,7 @@ type serviceCategoria interface {
 	List() ([]*categoria.Entity, error)
 	Find(cid string) (*categoria.Entity, error)
 	Update(id, kind string) error
+	Remove(id string) error
 }
 
 type categoriaServiceImpl struct{}
@@ -85,6 +86,16 @@ func (s *categoriaServiceImpl) Update(id, kind string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *categoriaServiceImpl) Remove(id string) error {
+	rep := repository.NewCategoriaRepository()
+	err := rep.Remove(id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

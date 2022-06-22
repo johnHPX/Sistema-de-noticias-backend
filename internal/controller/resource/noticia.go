@@ -216,7 +216,7 @@ func makeUpdateNoticiaEndPoint() endpoint.Endpoint {
 		var c []conteudo.Entity
 		for _, v := range req.Conteudo {
 			c = append(c, conteudo.Entity{
-				CID: v.CID,
+				CID:       v.CID,
 				Subtitulo: v.SubTitulo,
 				Texto:     v.Texto,
 			})
@@ -236,6 +236,55 @@ func UpdateNoticiaHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUpdateNoticiaEndPoint(),
 		decodeUpdateNoticiaRequest,
+		util.EncodeResponse,
+		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
+	)
+}
+
+// ==============================
+// =========== REMOVE ===========
+// ==============================
+
+type removeNoticiaRequest struct {
+	ID  string `json:"-"`
+	MID string `json:"-"`
+}
+
+type removeNoticiaResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodeRemoveNoticiaRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	dto := new(removeNoticiaRequest)
+	dto.ID = vars["id"]
+	dto.MID = r.URL.Query().Get("mid")
+	return dto, nil
+}
+
+func makeRemoveNoticiaEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*removeNoticiaRequest)
+		if !ok {
+			return nil, util.CreateHttpErrorResponse(http.StatusBadRequest, 1008, errors.New("invalid request"), "na")
+		}
+		service := service.NewNoticiaService()
+		err := service.Remove(req.ID)
+		if err != nil {
+			return nil, util.CreateHttpErrorResponse(http.StatusInternalServerError, 1009, err, req.MID)
+		}
+		//return data
+		return &removeNoticiaResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func RemoveNoticiaHandler() http.Handler {
+	return httptransport.NewServer(
+		makeRemoveNoticiaEndPoint(),
+		decodeRemoveNoticiaRequest,
 		util.EncodeResponse,
 		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
 	)

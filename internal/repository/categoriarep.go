@@ -14,6 +14,7 @@ type categoriaRepository interface {
 	Find(cid string) (*categoria.Entity, error)
 	FindByKind(kind string) (*categoria.Entity, error)
 	Update(e *categoria.Entity) error
+	Remove(id string) error
 }
 
 type categoriaRepositoryImpl struct{}
@@ -181,6 +182,38 @@ func (r *categoriaRepositoryImpl) Update(e *categoria.Entity) error {
 	}
 	if rowAffected != 1 {
 		return errors.New("error when updating")
+	}
+
+	return nil
+}
+
+func (r *categoriaRepositoryImpl) Remove(id string) error {
+	db, err := util.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	sqlText := `
+	update tb_categoria set
+		deleted_at = now()
+	where id = $1
+	`
+	statement, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+	result, err := statement.Exec(id)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowAffected != 1 {
+		return errors.New("error when deleting")
 	}
 
 	return nil

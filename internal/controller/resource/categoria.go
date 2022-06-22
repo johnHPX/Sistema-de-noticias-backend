@@ -127,7 +127,7 @@ type findCategoriaRequest struct {
 }
 
 type findCategoriaResponse struct {
-	CID  string `json:"cid"`
+	CID  string `json:"id"`
 	Kind string `json:"kind"`
 	MID  string `json:"mid"`
 }
@@ -221,6 +221,54 @@ func UpdateCategoriaHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUpdateCategoriandPoint(),
 		decodeUpdateategoriaRequest,
+		util.EncodeResponse,
+		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
+	)
+}
+
+// ==============================
+// =========== REMOVE ===========
+// ==============================
+
+type removeCategoriaRequest struct {
+	ID  string `json:"-"`
+	MID string `json:"-"`
+}
+
+type removeCategoriaResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodeRemoveategoriaRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	dto := new(removeCategoriaRequest)
+	dto.ID = vars["id"]
+	return dto, nil
+}
+
+func makeRemoveCategoriandPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*removeCategoriaRequest)
+		if !ok {
+			return nil, util.CreateHttpErrorResponse(http.StatusBadRequest, 1008, errors.New("invalid request"), "na")
+		}
+		svc := service.NewCategoriaService()
+		err := svc.Remove(req.ID)
+		if err != nil {
+			return nil, util.CreateHttpErrorResponse(http.StatusInternalServerError, 1009, err, req.MID)
+		}
+		//return data
+		return &updateCategoriaResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func RemoveCategoriaHandler() http.Handler {
+	return httptransport.NewServer(
+		makeRemoveCategoriandPoint(),
+		decodeRemoveategoriaRequest,
 		util.EncodeResponse,
 		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
 	)

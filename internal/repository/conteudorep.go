@@ -12,6 +12,7 @@ type conteudoRepository interface {
 	Store(e *conteudo.Entity) error
 	ListByNoticia(nid string) ([]*conteudo.Entity, error)
 	Update(e *conteudo.Entity) error
+	Remove(id string) error
 }
 
 type conteudoRepositoryImpl struct{}
@@ -137,6 +138,38 @@ func (r *conteudoRepositoryImpl) Update(e *conteudo.Entity) error {
 	}
 	if rowAffected != 1 {
 		return errors.New("error when updating")
+	}
+
+	return nil
+}
+
+func (r *conteudoRepositoryImpl) Remove(id string) error {
+	db, err := util.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	sqlText := `
+	update tb_conteudo set
+		deleted_at = now()
+	where id = $1
+	`
+	statement, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+	result, err := statement.Exec(id)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowAffected != 1 {
+		return errors.New("error when deleting")
 	}
 
 	return nil

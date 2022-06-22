@@ -16,6 +16,7 @@ type serviceNoticia interface {
 	List() ([]*noticia.NoticiaEntity, error)
 	ListByTitOrCat(titOrCat string) ([]*noticia.NoticiaEntity, error)
 	Update(conteudos []conteudo.Entity, NID, titulo, categoria string) error
+	Remove(id string) error
 }
 
 type noticiaServiceimpl struct{}
@@ -44,7 +45,7 @@ func (s *noticiaServiceimpl) Store(conteudos []conteudo.Entity, titulo, cate str
 			return err
 		}
 		v.Texto = str
-		if err := validator.CheckLen(2024, v.Texto); err != nil {
+		if err := validator.CheckLen(5000, v.Texto); err != nil {
 			return err
 		}
 		conteudosFormated = append(conteudosFormated, conteudo.Entity{
@@ -299,6 +300,37 @@ func (s *noticiaServiceimpl) Update(conteudos []conteudo.Entity, NID, titulo, ca
 	NCEntity.CID = nEntity.CID
 	// update
 	err = noticiaCategoriaRep.Update(NCEntity)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *noticiaServiceimpl) Remove(id string) error {
+	conteudoRep := repository.NewConteudoRepository()
+	conteudosEntities, err := conteudoRep.ListByNoticia(id)
+	if err != nil {
+		return err
+	}
+	for _, v := range conteudosEntities {
+		err := conteudoRep.Remove(v.CID)
+		if err != nil {
+			return err
+		}
+	}
+
+	noticiaCategoriaRep := repository.NewNoticiaCategoriaRepository()
+	NCEntity, err := noticiaCategoriaRep.FindByNID(id)
+	if err != nil {
+		return err
+	}
+	err = noticiaCategoriaRep.Remove(NCEntity.ID)
+	if err != nil {
+		return err
+	}
+
+	noticiaRep := repository.NewNoticiaRepository()
+	err = noticiaRep.Remove(id)
 	if err != nil {
 		return err
 	}

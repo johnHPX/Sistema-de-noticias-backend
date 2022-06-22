@@ -13,6 +13,7 @@ type noticiaCategoriaRepository interface {
 	List() ([]*noticiacategoria.Entity, error)
 	FindByNID(nid string) (*noticiacategoria.Entity, error)
 	Update(e *noticiacategoria.Entity) error
+	Remove(id string) error
 }
 
 type noticiaCategoriaRepositoryImpl struct{}
@@ -159,6 +160,38 @@ func (r *noticiaCategoriaRepositoryImpl) Update(e *noticiacategoria.Entity) erro
 	}
 	if rowAffected != 1 {
 		return errors.New("error when updating")
+	}
+
+	return nil
+}
+
+func (r *noticiaCategoriaRepositoryImpl) Remove(id string) error {
+	db, err := util.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	sqlText := `
+	update tb_noticia_categoria set
+		deleted_at = now()
+	where id = $1
+	`
+	statement, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+	result, err := statement.Exec(id)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowAffected != 1 {
+		return errors.New("error when deleting")
 	}
 
 	return nil
