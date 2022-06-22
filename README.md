@@ -59,12 +59,11 @@ criando um nova categoria
 | ------- | ------ | ------ |
 | body    | object | POST   |
 
-```
 | attribute name | type     | size  | is it required? | description                                      |
 | -------------- | -------- | ----- | --------------- | ------------------------------------------------ |
 | `kind`         | `string` | `255` | `true`          | tipo da categoria                                |
 | `mid`          | `string` | `-`   | `false`         | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 #### - _Response_
 
@@ -72,11 +71,10 @@ criando um nova categoria
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
 | attribute name | type     | description                                      |
 | -------------- | -------- | ------------------------------------------------ |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 ## 2. [HOST:PORT]/categorias
 
@@ -88,11 +86,11 @@ listando categorias
 | ------- | ---- | ------ |
 | queries | -    | GET    |
 
-```
+
 | attribute name | type     | size | is it required? | description                                      |
 | -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
 | `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 #### - _Response_
 
@@ -100,7 +98,7 @@ listando categorias
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
+
 | attribute name | type          | description                                      |
 | -------------- | ------------- | ------------------------------------------------ |
 | `count`        | `int`         | numero linhas trazidas do database               |
@@ -113,8 +111,6 @@ listando categorias
 | `kind`    | `string` | tipo da categoria |
 
 
-```
-
 ## 3. [HOST:PORT]/categoria/{id}
 
 buscando uma categoria por id de categoria
@@ -125,11 +121,10 @@ buscando uma categoria por id de categoria
 | ------- | ---- | ------ |
 | queries | -    | GET    |
 
-```
+
 | attribute name | type     | size | is it required? | description                                      |
 | -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
 | `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
-```
 
 #### - _Response_
 
@@ -137,13 +132,11 @@ buscando uma categoria por id de categoria
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
 | attribute name | type     | description                                      |
 | -------------- | -------- | ------------------------------------------------ |
 | `id`           | `string` | id da categoria                                  |
 | `kind`         | `string` | tipo da categoria                                |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
-```
 
 ## 4. [HOST:PORT]/categoria/{id}
 
@@ -155,12 +148,11 @@ atualizando uma categoria por id de categoria
 | ------- | ------ | ------ |
 | body    | object | PUT    |
 
-```
 | attribute name | type     | size  | is it required? | description                                      |
 | -------------- | -------- | ----- | --------------- | ------------------------------------------------ |
 | `kind`         | `string` | `255` | `true`          | tipo da categoria                                |
 | `mid`          | `string` | `-`   | `false`         | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 #### - _Response_
 
@@ -168,11 +160,9 @@ atualizando uma categoria por id de categoria
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
 | attribute name | type     | description                                      |
 | -------------- | -------- | ------------------------------------------------ |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
-```
 
 ## 5. [HOST:PORT]/categoria/{id}
 
@@ -184,11 +174,9 @@ deletando uma categoria por id de categoria
 | ------- | ---- | ------ |
 | queries | -    | DELETE |
 
-```
 | attribute name | type     | size | is it required? | description                                      |
 | -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
 | `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
-```
 
 #### - _Response_
 
@@ -196,11 +184,9 @@ deletando uma categoria por id de categoria
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
 | attribute name | type     | description                                      |
 | -------------- | -------- | ------------------------------------------------ |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
-```
 
 ## 6. [HOST:PORT]/noticia
 
@@ -212,7 +198,6 @@ criando um nova notícia
 | ------- | ------ | ------ |
 | body    | object | POST   |
 
-```
 | attribute name | type         | size  | is it required? | description                                      |
 | -------------- | ------------ | ----- | --------------- | ------------------------------------------------ |
 | `titulo`       | `string`     | `255` | `true`          | titulo da notícia                                |
@@ -224,7 +209,7 @@ criando um nova notícia
 | ----------- | -------- | ------ | --------------- | -------------------------------------- |
 | `subTitulo` | `string` | `255`  | `true`          | subtitulo da notícia(titulo do topico) |
 | `texto`     | `string` | `5000` | `true`          | texto do topico                        |
-```
+
 
 #### - _Response_
 
@@ -232,11 +217,11 @@ criando um nova notícia
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
+
 | attribute name | type     | description                                      |
 | -------------- | -------- | ------------------------------------------------ |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 ## 7. [HOST:PORT]/noticias
 
@@ -248,11 +233,11 @@ listando noticias
 | ------- | ---- | ------ |
 | queries | -    | GET    |
 
-```
+
 | attribute name | type     | size | is it required? | description                                      |
 | -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
 | `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 #### - _Response_
 
@@ -260,7 +245,7 @@ listando noticias
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
+
 | attribute name | type         | description                                      |
 | -------------- | ------------ | ------------------------------------------------ |
 | `count`        | `int`        | numero linhas trazidas do database               |
@@ -278,7 +263,7 @@ listando noticias
 | ----------- | -------- | -------------------------------------- |
 | `subTitulo` | `string` | subtitulo da notícia(titulo do topico) |
 | `texto`     | `string` | texto do topico                        |
-```
+
 
 ## 8. [HOST:PORT]/noticia/{titCat}
 
@@ -290,11 +275,11 @@ listando noticias por titulo ou categoria
 | ------- | ---- | ------ |
 | queries | -    | GET    |
 
-```
+
 | attribute name | type     | size | is it required? | description                                      |
 | -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
 | `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 #### - _Response_
 
@@ -302,7 +287,7 @@ listando noticias por titulo ou categoria
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
+
 | attribute name | type         | description                                      |
 | -------------- | ------------ | ------------------------------------------------ |
 | `count`        | `int`        | numero linhas trazidas do database               |
@@ -320,7 +305,7 @@ listando noticias por titulo ou categoria
 | ----------- | -------- | -------------------------------------- |
 | `subTitulo` | `string` | subtitulo da notícia(titulo do topico) |
 | `texto`     | `string` | texto do topico                        |
-```
+
 
 ## 9. [HOST:PORT]/noticia/{nid}
 
@@ -332,7 +317,7 @@ atualizando uma noticia por id de noticia
 | ------- | ------ | ------ |
 | body    | object | PUT    |
 
-```
+
 | attribute name | type         | size  | is it required? | description                                      |
 | -------------- | ------------ | ----- | --------------- | ------------------------------------------------ |
 | `titulo`       | `string`     | `255` | `true`          | titulo da notícia                                |
@@ -345,7 +330,7 @@ atualizando uma noticia por id de noticia
 | `cid`       | `string` | `36`   | `true`          | id do conteudo                         |
 | `subTitulo` | `string` | `255`  | `true`          | subtitulo da notícia(titulo do topico) |
 | `texto`     | `string` | `5000` | `true`          | texto do topico                        |
-```
+
 
 #### - _Response_
 
@@ -353,11 +338,11 @@ atualizando uma noticia por id de noticia
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
+
 | attribute name | type     | description                                      |
 | -------------- | -------- | ------------------------------------------------ |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 ## 10. [HOST:PORT]/noticia/{nid}
 
@@ -369,11 +354,11 @@ deletando uma noticia por id de noticia
 | ------- | ---- | ------ |
 | queries | -    | DELETE |
 
-```
+
 | attribute name | type     | size | is it required? | description                                      |
 | -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
 | `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 #### - _Response_
 
@@ -381,11 +366,11 @@ deletando uma noticia por id de noticia
 | ------- | ------ | ------ |
 | body    | object | 200    |
 
-```
+
 | attribute name | type     | description                                      |
 | -------------- | -------- | ------------------------------------------------ |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
-```
+
 
 
 the end!
