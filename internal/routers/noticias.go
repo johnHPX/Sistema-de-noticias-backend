@@ -1,36 +1,40 @@
 package routers
 
-import "github.com/jhonatasfreitas17/sistemaDeNoticias/internal/controller/resource"
+import (
+	"net/http"
+
+	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/controller/resource"
+)
 
 var RouterNotice = []Router{
 	{
 		TokenIsReq: false,
 		Path:       "/noticia",
 		EndPointer: resource.StoreNoticiaHandler().ServeHTTP,
-		Method:     "POST",
+		Method:     http.MethodPost,
 	},
 	{
 		TokenIsReq: false,
 		Path:       "/noticias",
 		EndPointer: resource.ListNoticiaHandler().ServeHTTP,
-		Method:     "GET",
+		Method:     http.MethodGet,
 	},
 	{
 		TokenIsReq: false,
-		Path:       "/noticia/{titcat}",
+		Path:       "/noticia/{titcat}/list",
 		EndPointer: resource.ListByTitOrCatNoticiaHandler().ServeHTTP,
-		Method:     "GET",
+		Method:     http.MethodGet,
 	},
 	{
 		TokenIsReq: false,
-		Path:       "/noticia/{id}",
+		Path:       "/noticia/{id}/update",
 		EndPointer: resource.UpdateNoticiaHandler().ServeHTTP,
-		Method:     "PUT",
+		Method:     http.MethodPut,
 	},
 	{
 		TokenIsReq: false,
-		Path:       "/noticia/{id}",
+		Path:       "/noticia/{id}/remove",
 		EndPointer: resource.RemoveNoticiaHandler().ServeHTTP,
-		Method:     "DELETE",
+		Method:     http.MethodDelete,
 	},
 }

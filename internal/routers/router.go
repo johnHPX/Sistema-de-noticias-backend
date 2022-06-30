@@ -39,9 +39,9 @@ func (s *webServiceImpl) configuration() {
 	routers = append(routers, RouterCategoria...)
 	for _, router := range routers {
 		if router.TokenIsReq {
-			s.Router.HandleFunc(router.Path, util.Logger(util.Authenticate(router.EndPointer))).Methods(router.Method)
+			s.Router.HandleFunc(router.Path, util.Logger(util.Authenticate(router.EndPointer), router.Method))
 		}
-		s.Router.HandleFunc(router.Path, util.Logger(router.EndPointer)).Methods(router.Method)
+		s.Router.HandleFunc(router.Path, util.Logger(router.EndPointer, router.Method))
 	}
 }
 

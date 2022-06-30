@@ -111,7 +111,7 @@ listando categorias
 | `kind`    | `string` | tipo da categoria |
 
 
-## 3. [HOST:PORT]/categoria/{id}
+## 3. [HOST:PORT]/categoria/{id}/find
 
 buscando uma categoria por id de categoria
 
@@ -138,7 +138,7 @@ buscando uma categoria por id de categoria
 | `kind`         | `string` | tipo da categoria                                |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
-## 4. [HOST:PORT]/categoria/{id}
+## 4. [HOST:PORT]/categoria/{id}/update
 
 atualizando uma categoria por id de categoria
 
@@ -164,7 +164,7 @@ atualizando uma categoria por id de categoria
 | -------------- | -------- | ------------------------------------------------ |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
-## 5. [HOST:PORT]/categoria/{id}
+## 5. [HOST:PORT]/categoria/{id}/remove
 
 deletando uma categoria por id de categoria
 
@@ -225,7 +225,7 @@ criando um nova notícia
 
 ## 7. [HOST:PORT]/noticias
 
-listando noticias
+listando todas as noticias
 
 #### - _Request_
 
@@ -265,7 +265,7 @@ listando noticias
 | `texto`     | `string` | texto do topico                        |
 
 
-## 8. [HOST:PORT]/noticia/{titCat}
+## 8. [HOST:PORT]/noticia/{titCat}/list
 
 listando noticias por titulo ou categoria
 
@@ -307,7 +307,7 @@ listando noticias por titulo ou categoria
 | `texto`     | `string` | texto do topico                        |
 
 
-## 9. [HOST:PORT]/noticia/{nid}
+## 9. [HOST:PORT]/noticia/{nid}/update
 
 atualizando uma noticia por id de noticia
 
@@ -344,7 +344,7 @@ atualizando uma noticia por id de noticia
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
 
-## 10. [HOST:PORT]/noticia/{nid}
+## 10. [HOST:PORT]/noticia/{nid}/remove
 
 deletando uma noticia por id de noticia
 

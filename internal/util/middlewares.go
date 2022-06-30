@@ -4,15 +4,22 @@ import (
 	"net/http"
 )
 
-func Logger(next http.HandlerFunc) http.HandlerFunc {
+func Logger(next http.HandlerFunc, method string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
-		w.Header().Set("Access-Control-Allow-Headers", "X-Token")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-PINGOTHER, X-Auth-Token")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Request-Width, Content-Type, Accept")
-		next(w, r)
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		} else if r.Method == method {
+			next(w, r)
+		} else {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	}
 }
 

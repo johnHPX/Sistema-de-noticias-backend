@@ -1,36 +1,40 @@
 package routers
 
-import "github.com/jhonatasfreitas17/sistemaDeNoticias/internal/controller/resource"
+import (
+	"net/http"
+
+	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/controller/resource"
+)
 
 var RouterCategoria = []Router{
 	{
 		TokenIsReq: false,
 		Path:       "/categoria",
 		EndPointer: resource.StoreCategoriaHandler().ServeHTTP,
-		Method:     "POST",
+		Method:     http.MethodPost,
 	},
 	{
 		TokenIsReq: false,
 		Path:       "/categorias",
 		EndPointer: resource.ListCategoriaHandler().ServeHTTP,
-		Method:     "GET",
+		Method:     http.MethodGet,
 	},
 	{
 		TokenIsReq: false,
-		Path:       "/categoria/{id}",
+		Path:       "/categoria/{id}/find",
 		EndPointer: resource.FindCategoriaHandler().ServeHTTP,
-		Method:     "GET",
+		Method:     http.MethodGet,
 	},
 	{
 		TokenIsReq: false,
-		Path:       "/categoria/{id}",
+		Path:       "/categoria/{id}/update",
 		EndPointer: resource.UpdateCategoriaHandler().ServeHTTP,
-		Method:     "PUT",
+		Method:     http.MethodPut,
 	},
 	{
 		TokenIsReq: false,
-		Path:       "/categoria/{id}",
+		Path:       "/categoria/{id}/remove",
 		EndPointer: resource.RemoveCategoriaHandler().ServeHTTP,
-		Method:     "DELETE",
+		Method:     http.MethodDelete,
 	},
 }
