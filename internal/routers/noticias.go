@@ -21,8 +21,14 @@ var RouterNotice = []Router{
 	},
 	{
 		TokenIsReq: false,
-		Path:       "/noticia/{titcat}/list",
+		Path:       "/noticias/{titcat}/list",
 		EndPointer: resource.ListByTitOrCatNoticiaHandler().ServeHTTP,
+		Method:     http.MethodGet,
+	},
+	{
+		TokenIsReq: false,
+		Path:       "/noticia/{id}/find",
+		EndPointer: resource.FindNoticiaHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},
 	{

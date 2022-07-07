@@ -371,6 +371,42 @@ deletando uma noticia por id de noticia
 | -------------- | -------- | ------------------------------------------------ |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
+## 11. [HOST:PORT]/noticia/{id}/find
+
+buscando uma noticia pelo seu id
+
+#### - _Request_
+
+| request | type | method |
+| ------- | ---- | ------ |
+| queries | -    | GET    |
+
+
+| attribute name | type     | size | is it required? | description                                      |
+| -------------- | -------- | ---- | --------------- | ------------------------------------------------ |
+| `mid`          | `string` | `-`  | `false`         | mensagem da resposta caso o codigo http seja 200 |
+
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type         | description                                      |
+| -------------- | ------------ | ------------------------------------------------ |
+| `id`           | `string`     | id da noticia                                    |
+| `titulo`       | `string`     | titulo da notícia                                |
+| `conteudos`    | `[]conteudo` | topicos da notícia                               |
+| `categoria`    | `string`     | categoria da notícia                             |
+| `mid`          | `string`     | mensagem da resposta caso o codigo http seja 200 |
+
+| conteudo    | type     | description                            |
+| ----------- | -------- | -------------------------------------- |
+| `subTitulo` | `string` | subtitulo da notícia(titulo do topico) |
+| `texto`     | `string` | texto do topico                        |
+
 
 
 the end!

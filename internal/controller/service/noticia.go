@@ -15,6 +15,7 @@ type serviceNoticia interface {
 	Store(conteudos []conteudo.Entity, titulo, categoria string) error
 	List() ([]*noticia.NoticiaEntity, error)
 	ListByTitOrCat(titOrCat string) ([]*noticia.NoticiaEntity, error)
+	FindById(id string) (*noticia.NoticiaEntity, error)
 	Update(conteudos []conteudo.Entity, NID, titulo, categoria string) error
 	Remove(id string) error
 }
@@ -174,6 +175,30 @@ func (s *noticiaServiceimpl) ListByTitOrCat(titOrCat string) ([]*noticia.Noticia
 	}
 
 	return entities, nil
+}
+
+func (s *noticiaServiceimpl) FindById(id string) (*noticia.NoticiaEntity, error) {
+	noticaRep := repository.NewNoticiaRepository()
+	entity, err := noticaRep.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+	conteudoRep := repository.NewConteudoRepository()
+	conteudoEntities, err := conteudoRep.ListByNoticia(entity.ID)
+	if err != nil {
+		return nil, err
+	}
+	c := make([]noticia.Conteudos, 0)
+	for _, v := range conteudoEntities {
+		c = append(c, noticia.Conteudos{
+			CID:       v.CID,
+			SubTitulo: v.Subtitulo,
+			Texto:     v.Texto,
+		})
+	}
+	entity.Conteudo = c
+
+	return entity, nil
 }
 
 func (s *noticiaServiceimpl) Update(conteudos []conteudo.Entity, NID, titulo, cate string) error {

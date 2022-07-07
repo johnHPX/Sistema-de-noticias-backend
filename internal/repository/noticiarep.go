@@ -12,6 +12,7 @@ type noticiaRepository interface {
 	Store(e *noticia.Entity) error
 	List() ([]*noticia.NoticiaEntity, error)
 	ListByTitOrCat(titCat string) ([]*noticia.NoticiaEntity, error)
+	FindById(id string) (*noticia.NoticiaEntity, error)
 	Update(e *noticia.Entity) error
 	Remove(id string) error
 }
@@ -145,6 +146,37 @@ func (r *noticiaRepositoryImpl) ListByTitOrCat(titCat string) ([]*noticia.Notici
 	}
 
 	return entities, nil
+}
+
+func (r *noticiaRepositoryImpl) FindById(id string) (*noticia.NoticiaEntity, error) {
+	db, err := util.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	sqlText := `
+	select n.id,
+		n.titulo,
+		ca.kind
+	from tb_noticia  n
+	INNER JOIN tb_noticia_categoria nc ON nc.nid = n.id
+	INNER JOIN tb_categoria ca ON ca.id = nc.cid
+	where n.deleted_at is null and ca.deleted_at is null and n.id = $1
+	`
+	row, err := db.Query(sqlText, id)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+	if row.Next() {
+		e, err := r.scanIterator(row)
+		if err != nil {
+			return nil, err
+		}
+		return e, nil
+	}
+
+	return nil, errors.New("error finding")
 }
 
 func (r *noticiaRepositoryImpl) Update(e *noticia.Entity) error {

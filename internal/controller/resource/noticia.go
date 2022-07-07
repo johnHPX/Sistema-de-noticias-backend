@@ -181,6 +181,59 @@ func ListByTitOrCatNoticiaHandler() http.Handler {
 }
 
 // ==============================
+// ===== FIND BY ID  ===========
+// ==============================
+
+type findNoticiaRequest struct {
+	ID  string `json:"-"`
+	MID string `json:"-"`
+}
+
+type findNoticiaResponse struct {
+	noticia.NoticiaEntity
+	MID string `json:"mid"`
+}
+
+func decodeFindNoticiaRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	mid := r.URL.Query().Get("mid")
+	dto := &findNoticiaRequest{
+		ID:  vars["id"],
+		MID: mid,
+	}
+	return dto, nil
+}
+
+func makeFindNoticiaEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*findNoticiaRequest)
+		if !ok {
+			return nil, util.CreateHttpErrorResponse(http.StatusBadRequest, 1006, errors.New("invalid request"), "na")
+		}
+		service := service.NewNoticiaService()
+		entity, err := service.FindById(req.ID)
+		if err != nil {
+			return nil, util.CreateHttpErrorResponse(http.StatusInternalServerError, 1007, err, req.MID)
+		}
+		//return data
+		return &findNoticiaResponse{
+			NoticiaEntity: *entity,
+			MID:           req.MID,
+		}, nil
+	}
+}
+
+func FindNoticiaHandler() http.Handler {
+	return httptransport.NewServer(
+		makeFindNoticiaEndPoint(),
+		decodeFindNoticiaRequest,
+		util.EncodeResponse,
+		httptransport.ServerErrorEncoder(util.ErrorEncoder()),
+	)
+}
+
+// ==============================
 // =========== UPDATE ===========
 // ==============================
 
