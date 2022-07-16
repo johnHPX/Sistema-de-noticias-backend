@@ -3,7 +3,7 @@ package routers
 import (
 	"net/http"
 
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/controller/resource"
+	"github.com/johnHPX/sistemaDeNoticias/internal/controller/resource"
 )
 
 var RouterNotice = []Router{

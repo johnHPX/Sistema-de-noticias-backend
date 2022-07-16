@@ -9,9 +9,9 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/controller/service"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/categoria"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
+	"github.com/johnHPX/sistemaDeNoticias/internal/controller/service"
+	"github.com/johnHPX/sistemaDeNoticias/internal/model/categoria"
+	"github.com/johnHPX/sistemaDeNoticias/internal/util"
 )
 
 // ==============================

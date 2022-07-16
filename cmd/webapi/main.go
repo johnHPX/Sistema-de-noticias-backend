@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/routers"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
+	"github.com/johnHPX/sistemaDeNoticias/internal/routers"
+	"github.com/johnHPX/sistemaDeNoticias/internal/util"
 )
 
 func main() {

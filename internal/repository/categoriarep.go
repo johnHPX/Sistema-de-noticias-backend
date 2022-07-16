@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/categoria"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
+	"github.com/johnHPX/sistemaDeNoticias/internal/model/categoria"
+	"github.com/johnHPX/sistemaDeNoticias/internal/util"
 )
 
 type categoriaRepository interface {

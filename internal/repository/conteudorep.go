@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/conteudo"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
+	"github.com/johnHPX/sistemaDeNoticias/internal/model/conteudo"
+	"github.com/johnHPX/sistemaDeNoticias/internal/util"
 )
 
 type conteudoRepository interface {

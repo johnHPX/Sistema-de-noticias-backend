@@ -4,11 +4,11 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/conteudo"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/noticia"
-	noticiacategoria "github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/noticiaCategoria"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/repository"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util/validator"
+	"github.com/johnHPX/sistemaDeNoticias/internal/model/conteudo"
+	"github.com/johnHPX/sistemaDeNoticias/internal/model/noticia"
+	noticiacategoria "github.com/johnHPX/sistemaDeNoticias/internal/model/noticiaCategoria"
+	"github.com/johnHPX/sistemaDeNoticias/internal/repository"
+	"github.com/johnHPX/sistemaDeNoticias/internal/util/validator"
 )
 
 type serviceNoticia interface {
@@ -267,7 +267,7 @@ func (s *noticiaServiceimpl) Update(conteudos []conteudo.Entity, NID, titulo, ca
 
 	// conteudo repository
 	conteudoRep := repository.NewConteudoRepository()
-	// vcerific if id of contedos exits
+	// verific if id of contedos exits
 	conteudosEntities, err := conteudoRep.ListByNoticia(NID)
 	if err != nil {
 		return err

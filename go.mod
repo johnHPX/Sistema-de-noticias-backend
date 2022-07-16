@@ -1,4 +1,4 @@
-module github.com/jhonatasfreitas17/sistemaDeNoticias
+module github.com/johnHPX/sistemaDeNoticias
 
 go 1.18
 

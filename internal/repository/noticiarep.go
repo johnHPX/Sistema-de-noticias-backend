@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/noticia"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util"
+	"github.com/johnHPX/sistemaDeNoticias/internal/model/noticia"
+	"github.com/johnHPX/sistemaDeNoticias/internal/util"
 )
 
 type noticiaRepository interface {

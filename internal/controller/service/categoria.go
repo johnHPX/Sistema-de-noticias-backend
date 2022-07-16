@@ -2,9 +2,9 @@ package service
 
 import (
 	"github.com/google/uuid"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/model/categoria"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/repository"
-	"github.com/jhonatasfreitas17/sistemaDeNoticias/internal/util/validator"
+	"github.com/johnHPX/sistemaDeNoticias/internal/model/categoria"
+	"github.com/johnHPX/sistemaDeNoticias/internal/repository"
+	"github.com/johnHPX/sistemaDeNoticias/internal/util/validator"
 )
 
 type serviceCategoria interface {
