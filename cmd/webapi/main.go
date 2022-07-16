@@ -24,6 +24,11 @@ func main() {
 	log.Println("settings started...")
 	log.Println(projectConfigs.Name)
 	log.Println("initialized routes")
+
+	if projectConfigs.Port == "" {
+		projectConfigs.Port = "4083"
+	}
+
 	//init web service
 	ctx := context.Background()
 	wsvc := routers.NewWebService(ctx)
