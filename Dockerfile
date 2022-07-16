@@ -1,4 +1,4 @@
-FROM golang:1.18.3 as build
+FROM golang:1.18-bullseye as build
 
 WORKDIR /app
 
@@ -8,8 +8,8 @@ COPY configs/ ./
 COPY internal/ ./
 COPY cmd/webapi/main.go ./
 
-RUN go mod tidy
-
+RUN go mod download
+RUN go mod verify
 RUN go build -o /server
 
 FROM gcr.io/distroless/base-debian10
@@ -17,7 +17,7 @@ FROM gcr.io/distroless/base-debian10
 WORKDIR /
 
 COPY --from=build /server /server
-COPY --from=build /configs/ /server
+COPY --from=build /configs/ /configs
 
 EXPOSE 4083
 
