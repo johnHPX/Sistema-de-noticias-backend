@@ -1,26 +1,33 @@
-FROM golang:1.18-bullseye as build
+# imagem oficial da golang
+FROM golang:1.18.3 as builder
 
+# criando e configurando o diretorio
+RUN mkdir -p /app
+ADD . /app
 WORKDIR /app
 
-COPY go.mod ./
-COPY go.sum ./
-COPY configs/ ./
-COPY internal/ ./
-COPY cmd/webapi/main.go ./
-
+# configurando o go mod
 RUN go mod download
 RUN go mod verify
-RUN go build -o /server
 
+# gerando um binario da aplicação
+RUN go build -o /server cmd/webapi/main.go
+
+# imagem distroless, para redução do dockerfile
 FROM gcr.io/distroless/base-debian10
 
+# configurando o diretorio
 WORKDIR /
 
-COPY --from=build /server /server
-COPY --from=build /configs/ /configs
+# copiando o binario e a pasta configs para dentro do distroless
+COPY --from=builder /server ./server
+ADD configs ./configs
 
+# espondo a porta da api
 EXPOSE 4083
 
+# defindo que o usuario não root tera acesso a aplicação
 USER nonroot:nonroot
 
-ENTRYPOINT [ "/server" ]
+# executando o binario
+ENTRYPOINT ["./server"]
